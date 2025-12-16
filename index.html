@@ -210,12 +210,12 @@
         function flipCard() {
             const cardInner = this.querySelector('.card-inner');
             // 檢查是否已經包含了 'flipped' 這個類別
-            if (!cardInner.claassList.contains('flipped')) {
-                // 如果還沒翻開，才執行翻轉動作
-                cardInner.claassList.add('flipped');
-                // 可選：移除點擊手勢，讓滑鼠移上去不再顯示手指符號
-                this.style.cursor = 'default';
-            }
+            if (!cardInner.classList.contains('flipped')) {
+            // 如果還沒翻開，才執行翻轉動作
+            cardInner.classList.add('flipped');
+            // 可選：移除點擊手勢，讓滑鼠移上去不再顯示手指符號
+            this.style.cursor = 'default';
+          }
         }
 
         // 建立單張卡片的 HTML 結構
@@ -283,5 +283,6 @@
     </script>
 </body>
 </html>
+
 
 
