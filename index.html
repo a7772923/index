@@ -6,7 +6,7 @@
     <title>注音符號學習卡</title>
     <style>
         /* ==================================================== */
-        /* 1. 全域樣式與版面設計 */
+        /* 1. 全域樣式與版面設計 (保留原有的漂亮設計) */
         /* ==================================================== */
         body {
             font-family: Arial, sans-serif;
@@ -29,7 +29,6 @@
             border-radius: 12px;
         }
 
-        /* 視圖切換 */
         .view {
             display: none;
             padding: 20px 0;
@@ -65,78 +64,68 @@
             background-color: #0056b3;
         }
 
-        /* 卡片顯示區域 */
         .card-container {
             display: flex;
-            /* 讓 Level 1 的單張卡片保持居中 */
             justify-content: center; 
             gap: 40px; 
             margin-top: 40px;
-            min-height: 200px; /* 確保版面不亂跑 */
+            min-height: 200px;
         }
         
         /* ==================================================== */
-        /* 2. 卡片翻轉樣式 (核心變動) */
+        /* 2. 卡片樣式 (修改：移除3D翻轉，保留視覺風格) */
         /* ==================================================== */
         .card {
-            background-color: transparent;
             width: 180px;
             height: 180px;
-            perspective: 1000px; /* 建立 3D 視角 */
-            cursor: pointer;
-        }
-
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-            transform-style: preserve-3d; 
-        }
-
-        /* 翻轉狀態：點擊後新增此類別 */
-        .card-inner.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden; 
             border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 4em; /* 注音符號大小 */
+            font-size: 5em; /* 字體放大 */
             font-weight: bold;
             color: white;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            user-select: none; /* 防止連點選取到文字 */
+            transition: transform 0.1s ease; /* 點擊時的輕微縮放感 */
         }
 
-        /* 卡片正面：點擊前顯示的文字 */
-        .card-front {
-            background-color: #ff9800; /* 統一使用橘色，更醒目 */
-            color: #333;
-            font-size: 1.5em;
-            padding: 10px;
-            box-sizing: border-box;
-            line-height: 1.2;
+        .card:active {
+            transform: scale(0.95); /* 按下去縮小一點點 */
         }
 
-        /* 卡片反面：注音符號 */
-        .card-back {
+        /* 第一關卡片顏色 (沿用原本背面漂亮的綠色) */
+        .level1-card {
             background-color: #4CAF50; 
-            transform: rotateY(180deg); 
+        }
+
+        /* 第二關卡片顏色 (沿用原本漂亮的藍色與粉色) */
+        .level2-card-left {
+             background-color: #2196F3; 
+        }
+        .level2-card-right {
+             background-color: #E91E63; 
+        }
+
+        /* 閃爍動畫 (從舊版移植過來) */
+        .card.new-symbol {
+            animation: symbol-flash 0.3s ease-in-out;
         }
         
-        /* Level 2 專用卡片顏色 */
-        .level2-card:first-child .card-front {
-             background-color: #2196F3; /* 第一張卡片正面：藍色 */
+        @keyframes symbol-flash {
+            0% { transform: scale(1.0); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1.0; }
+            100% { transform: scale(1.0); }
         }
-        .level2-card:last-child .card-front {
-             background-color: #E91E63; /* 第二張卡片正面：粉色 */
+
+        /* RWD 手機適配 */
+        @media (max-width: 600px) {
+            .card {
+                width: 140px;
+                height: 140px;
+                font-size: 4em;
+            }
         }
     </style>
 </head>
@@ -144,7 +133,7 @@
 
     <div class="container">
         <div id="home-view" class="view active">
-            <h1>注音符號隨機學習卡</h1>
+            <h1>注音符號隨機生成器</h1>
             <div class="btn-group">
                 <button class="btn" onclick="goToLevel(1)">進入 第一關 (一次一張)</button>
                 <button class="btn" onclick="goToLevel(2)">進入 第二關 (一次兩張)</button>
@@ -152,21 +141,19 @@
         </div>
 
         <div id="level1-view" class="view">
-            <h2>第一關：點擊卡片，隨機抽取一張注音</h2>
+            <h2>第一關：點擊卡片，直接切換注音</h2>
             <div class="card-container" id="level1-cards">
                 </div>
             <div class="btn-group">
-                <button class="btn" onclick="generateCards(1)">重新抽取新卡</button>
                 <button class="btn" onclick="showView('home-view')">返回首頁</button>
             </div>
         </div>
 
         <div id="level2-view" class="view">
-            <h2>第二關：點擊卡片，同時抽取兩張注音</h2>
+            <h2>第二關：點擊任一卡片，同時切換兩張</h2>
             <div class="card-container" id="level2-cards">
                 </div>
             <div class="btn-group">
-                <button class="btn" onclick="generateCards(2)">重新抽取新卡</button>
                 <button class="btn" onclick="showView('home-view')">返回首頁</button>
             </div>
         </div>
@@ -174,22 +161,21 @@
 
     <script>
         // ====================================================
-        // 3. JavaScript 邏輯 (工程師視角)
+        // 3. JavaScript 邏輯 (融合版：舊玩法 + 新架構)
         // ====================================================
         
-        // 修正後的符號池：ㄅ~ㄙ (21) + 一, ㄨ, ㄩ (3) = 24 個符號
         const bopomofoSymbols = [
             'ㄅ', 'ㄆ', 'ㄇ', 'ㄈ', 'ㄉ', 'ㄊ', 'ㄋ', 'ㄌ', 'ㄍ', 'ㄎ', 'ㄏ', 
             'ㄐ', 'ㄑ', 'ㄒ', 'ㄓ', 'ㄔ', 'ㄕ', 'ㄖ', 'ㄗ', 'ㄘ', 'ㄙ', 
             '一', 'ㄨ', 'ㄩ' 
         ];
 
-        // 隨機選擇注音符號
-        function getRandomBopomofo(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
+        // 隨機取得一個符號
+        function getRandomBopomofo() {
+            return bopomofoSymbols[Math.floor(Math.random() * bopomofoSymbols.length)];
         }
 
-        // 視圖切換函數
+        // 切換視圖
         function showView(viewId) {
             document.querySelectorAll('.view').forEach(view => {
                 view.classList.remove('active');
@@ -197,92 +183,351 @@
             document.getElementById(viewId).classList.add('active');
         }
 
-        // 進入關卡，並自動生成卡片
+        // 進入關卡
         function goToLevel(level) {
             showView('level' + level + '-view');
-            // 延遲執行，確保視圖切換動畫完成後才生成卡片，視覺效果更好
-            setTimeout(() => {
-                 generateCards(level);
-            }, 100);
-        }
-        
-        // 翻轉卡片的點擊事件處理函數 (翻閱後鎖定)
-        function flipCard() {
-            const cardInner = this.querySelector('.card-inner');
-            // 檢查是否已經包含了 'flipped' 這個類別
-            if (!cardInner.classList.contains('flipped')) {
-            // 如果還沒翻開，才執行翻轉動作
-            cardInner.classList.add('flipped');
-            // 可選：移除點擊手勢，讓滑鼠移上去不再顯示手指符號
-            this.style.cursor = 'default';
-          }
+            generateCards(level);
         }
 
-        // 建立單張卡片的 HTML 結構
-        function createCardElement(content, isLevel2) {
+        // 更新卡片內容與動畫 (舊版邏輯)
+        function updateCardVisual(cardElement, newSymbol) {
+            // 1. 移除動畫 class
+            cardElement.classList.remove('new-symbol');
+            
+            // 2. 強制瀏覽器重繪 (Magic trick to restart animation)
+            void cardElement.offsetWidth;
+            
+            // 3. 更新文字
+            cardElement.innerText = newSymbol;
+            
+            // 4. 加回動畫
+            cardElement.classList.add('new-symbol');
+        }
+
+        // 建立簡單版卡片 (無 3D 結構)
+        // type 參數用來決定顏色樣式: 'level1', 'level2-left', 'level2-right'
+        function createSimpleCard(type) {
             const card = document.createElement('div');
             card.classList.add('card');
             
-            // Level 2 的卡片需要額外的類別來應用不同的顏色
-            if (isLevel2) {
-                card.classList.add('level2-card');
-            }
+            // 根據類型加上對應的顏色 class
+            if (type === 'level1') card.classList.add('level1-card');
+            if (type === 'left') card.classList.add('level2-card-left');
+            if (type === 'right') card.classList.add('level2-card-right');
 
-            const cardInner = document.createElement('div');
-            cardInner.classList.add('card-inner');
-
-            const cardFront = document.createElement('div');
-            cardFront.classList.add('card-front');
-            cardFront.textContent = '請點擊';
-
-            const cardBack = document.createElement('div');
-            cardBack.classList.add('card-back');
-            cardBack.textContent = content;
-
-            cardInner.appendChild(cardFront);
-            cardInner.appendChild(cardBack);
-            card.appendChild(cardInner);
-
-            // 加上點擊事件 (單一卡片獨立監聽)
-            card.addEventListener('click', flipCard);
-
+            // 初始先給一個隨機符號
+            card.innerText = getRandomBopomofo();
+            
             return card;
         }
 
-        // 生成卡片的主函數：負責根據關卡等級建立卡片
+        // 生成與綁定事件主程式
         function generateCards(level) {
             const containerId = 'level' + level + '-cards';
             const container = document.getElementById(containerId);
-            container.innerHTML = ''; // 清空舊卡片
+            container.innerHTML = ''; // 清空
             
             if (level === 1) {
-                // 第一關：只生成一張卡片
-                const symbol = getRandomBopomofo(bopomofoSymbols);
-                const card = createCardElement(symbol, false);
+                // === 第一關：單張，點擊換字 ===
+                const card = createSimpleCard('level1');
+                
+                // 綁定點擊事件：只更新自己
+                card.onclick = function() {
+                    updateCardVisual(card, getRandomBopomofo());
+                };
+                
                 container.appendChild(card);
 
             } else if (level === 2) {
-                // 第二關：生成兩張卡片
-                const symbol1 = getRandomBopomofo(bopomofoSymbols);
-                const symbol2 = getRandomBopomofo(bopomofoSymbols);
+                // === 第二關：兩張，點擊任一張更新兩張 ===
+                const card1 = createSimpleCard('left');
+                const card2 = createSimpleCard('right');
 
-                // 第一張卡片 (左)
-                const card1 = createCardElement(symbol1, true); 
+                // 定義一個共用函式：更新兩張卡片
+                const updateBoth = function() {
+                    updateCardVisual(card1, getRandomBopomofo());
+                    updateCardVisual(card2, getRandomBopomofo());
+                };
+
+                // 兩張卡片綁定同一個事件
+                card1.onclick = updateBoth;
+                card2.onclick = updateBoth;
+
                 container.appendChild(card1);
-
-                // 第二張卡片 (右)
-                const card2 = createCardElement(symbol2, true);
                 container.appendChild(card2);
             }
         }
 
-        // 啟動時的初始化：預設顯示首頁
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            showView('home-view');
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注音符號學習卡</title>
+    <style>
+        /* ==================================================== */
+        /* 1. 全域樣式與版面設計 (保留原有的漂亮設計) */
+        /* ==================================================== */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        .view {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .btn-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center; 
+            gap: 40px; 
+            margin-top: 40px;
+            min-height: 200px;
+        }
+        
+        /* ==================================================== */
+        /* 2. 卡片樣式 (修改：移除3D翻轉，保留視覺風格) */
+        /* ==================================================== */
+        .card {
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5em; /* 字體放大 */
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            user-select: none; /* 防止連點選取到文字 */
+            transition: transform 0.1s ease; /* 點擊時的輕微縮放感 */
+        }
+
+        .card:active {
+            transform: scale(0.95); /* 按下去縮小一點點 */
+        }
+
+        /* 第一關卡片顏色 (沿用原本背面漂亮的綠色) */
+        .level1-card {
+            background-color: #4CAF50; 
+        }
+
+        /* 第二關卡片顏色 (沿用原本漂亮的藍色與粉色) */
+        .level2-card-left {
+             background-color: #2196F3; 
+        }
+        .level2-card-right {
+             background-color: #E91E63; 
+        }
+
+        /* 閃爍動畫 (從舊版移植過來) */
+        .card.new-symbol {
+            animation: symbol-flash 0.3s ease-in-out;
+        }
+        
+        @keyframes symbol-flash {
+            0% { transform: scale(1.0); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1.0; }
+            100% { transform: scale(1.0); }
+        }
+
+        /* RWD 手機適配 */
+        @media (max-width: 600px) {
+            .card {
+                width: 140px;
+                height: 140px;
+                font-size: 4em;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="home-view" class="view active">
+            <h1>注音符號隨機生成器</h1>
+            <div class="btn-group">
+                <button class="btn" onclick="goToLevel(1)">進入 第一關 (一次一張)</button>
+                <button class="btn" onclick="goToLevel(2)">進入 第二關 (一次兩張)</button>
+            </div>
+        </div>
+
+        <div id="level1-view" class="view">
+            <h2>第一關：點擊卡片，直接切換注音</h2>
+            <div class="card-container" id="level1-cards">
+                </div>
+            <div class="btn-group">
+                <button class="btn" onclick="showView('home-view')">返回首頁</button>
+            </div>
+        </div>
+
+        <div id="level2-view" class="view">
+            <h2>第二關：點擊任一卡片，同時切換兩張</h2>
+            <div class="card-container" id="level2-cards">
+                </div>
+            <div class="btn-group">
+                <button class="btn" onclick="showView('home-view')">返回首頁</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================================================
+        // 3. JavaScript 邏輯 (融合版：舊玩法 + 新架構)
+        // ====================================================
+        
+        const bopomofoSymbols = [
+            'ㄅ', 'ㄆ', 'ㄇ', 'ㄈ', 'ㄉ', 'ㄊ', 'ㄋ', 'ㄌ', 'ㄍ', 'ㄎ', 'ㄏ', 
+            'ㄐ', 'ㄑ', 'ㄒ', 'ㄓ', 'ㄔ', 'ㄕ', 'ㄖ', 'ㄗ', 'ㄘ', 'ㄙ', 
+            '一', 'ㄨ', 'ㄩ' 
+        ];
+
+        // 隨機取得一個符號
+        function getRandomBopomofo() {
+            return bopomofoSymbols[Math.floor(Math.random() * bopomofoSymbols.length)];
+        }
+
+        // 切換視圖
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        // 進入關卡
+        function goToLevel(level) {
+            showView('level' + level + '-view');
+            generateCards(level);
+        }
+
+        // 更新卡片內容與動畫 (舊版邏輯)
+        function updateCardVisual(cardElement, newSymbol) {
+            // 1. 移除動畫 class
+            cardElement.classList.remove('new-symbol');
+            
+            // 2. 強制瀏覽器重繪 (Magic trick to restart animation)
+            void cardElement.offsetWidth;
+            
+            // 3. 更新文字
+            cardElement.innerText = newSymbol;
+            
+            // 4. 加回動畫
+            cardElement.classList.add('new-symbol');
+        }
+
+        // 建立簡單版卡片 (無 3D 結構)
+        // type 參數用來決定顏色樣式: 'level1', 'level2-left', 'level2-right'
+        function createSimpleCard(type) {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            
+            // 根據類型加上對應的顏色 class
+            if (type === 'level1') card.classList.add('level1-card');
+            if (type === 'left') card.classList.add('level2-card-left');
+            if (type === 'right') card.classList.add('level2-card-right');
+
+            // 初始先給一個隨機符號
+            card.innerText = getRandomBopomofo();
+            
+            return card;
+        }
+
+        // 生成與綁定事件主程式
+        function generateCards(level) {
+            const containerId = 'level' + level + '-cards';
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // 清空
+            
+            if (level === 1) {
+                // === 第一關：單張，點擊換字 ===
+                const card = createSimpleCard('level1');
+                
+                // 綁定點擊事件：只更新自己
+                card.onclick = function() {
+                    updateCardVisual(card, getRandomBopomofo());
+                };
+                
+                container.appendChild(card);
+
+            } else if (level === 2) {
+                // === 第二關：兩張，點擊任一張更新兩張 ===
+                const card1 = createSimpleCard('left');
+                const card2 = createSimpleCard('right');
+
+                // 定義一個共用函式：更新兩張卡片
+                const updateBoth = function() {
+                    updateCardVisual(card1, getRandomBopomofo());
+                    updateCardVisual(card2, getRandomBopomofo());
+                };
+
+                // 兩張卡片綁定同一個事件
+                card1.onclick = updateBoth;
+                card2.onclick = updateBoth;
+
+                container.appendChild(card1);
+                container.appendChild(card2);
+            }
+        }
+
+        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
             showView('home-view');
         });
     </script>
 </body>
 </html>
-
-
-
